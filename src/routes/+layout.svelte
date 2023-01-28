@@ -1,5 +1,7 @@
 <script lang="ts">
   import { base } from "$app/paths";
+  import { page } from "$app/stores";
+  import { fly } from "svelte/transition";
 </script>
 
 <nav>
@@ -8,9 +10,12 @@
     <li><a href="{base}/authenticate">Authenticate</a></li>
   </ul>
 </nav>
-<main>
-  <slot />
-</main>
+
+{#key $page.url}
+  <main in:fly={{ y: -15, duration: 250 }}>
+    <slot />
+  </main>
+{/key}
 
 <style>
   nav {
