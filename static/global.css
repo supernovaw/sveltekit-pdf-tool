@@ -6,7 +6,6 @@ html {
 
 body {
     margin: 0;
-    padding: 16px;
     min-height: 100vh;
     box-sizing: border-box;
 }
@@ -16,10 +15,6 @@ body {
 @media only screen and (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
         --background-color: #181a1b;
-        --primary: #d81b60;
-        --primary-hover: #e91e63;
-        --primary-focus: rgba(216, 27, 96, 0.25);
-        --primary-inverse: #FFF;
     }
 }
 
@@ -29,4 +24,6 @@ body {
     --primary-hover: #e91e63;
     --primary-focus: rgba(216, 27, 96, 0.25);
     --primary-inverse: #FFF;
+    --form-element-spacing-vertical: 0.25rem;
+    --form-element-spacing-horizontal: 0.5rem;
 }
