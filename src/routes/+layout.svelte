@@ -4,7 +4,8 @@
 
 <nav>
   <ul>
-    <li><a href="{base}">Home</a></li>
+    <li><a href={base}>Home</a></li>
+    <li><a href="{base}/authenticate">Authenticate</a></li>
   </ul>
 </nav>
 <main>
@@ -15,12 +16,8 @@
   nav {
     display: flex;
     justify-content: flex-end;
+    padding-inline-end: 16px;
     overflow: hidden;
-  }
-
-  a {
-    padding-inline: 16px;
-    margin-inline: 0;
   }
 
   main {
