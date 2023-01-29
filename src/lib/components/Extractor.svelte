@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { base } from "$app/paths";
+  import { API_URL } from "$lib/consts";
   import { authState, extraction } from "$lib/state";
   import { slide } from "svelte/transition";
   import RangeSelector from "./RangeSelector.svelte";
@@ -26,12 +26,11 @@
     sentFileName = file.name;
 
     const formData = new FormData();
-    formData.append("action", "upload");
     formData.append("document", file);
     formData.append("key", $authState.key!);
 
     uploadLoading = true;
-    fetch(`${base}/extract`, { method: "POST", body: formData })
+    fetch(`${API_URL}/upload`, { method: "POST", body: formData })
       .then(onUploadResponse)
       .catch((err) => (uploadError = `Upload failed (${err.message})`))
       .finally(() => (uploadLoading = false));
@@ -61,9 +60,8 @@
   async function onRemoveFile() {
     removeLoading = true;
     const formData = new FormData();
-    formData.append("action", "remove");
     formData.append("key", $authState.key!);
-    const response = await fetch(`${base}/extract`, {
+    const response = await fetch(`${API_URL}/remove`, {
       method: "POST",
       body: formData,
     }).finally(() => (removeLoading = false));
@@ -88,7 +86,7 @@
     formData.append("pages", selectedPages.join(","));
     extractLoading = true;
     extractError = null;
-    await fetch(`${base}/extract`, {
+    await fetch(`${API_URL}/extract`, {
       method: "POST",
       body: formData,
     })
@@ -162,7 +160,7 @@
   <a
     role="button"
     style="width: 500px"
-    href="{base}/extract?key={$authState.key}"
+    href="{API_URL}/download?key={$authState.key}"
     download="Extracted-{$extraction.filename}"
     data-sveltekit-preload-data="off"
   >

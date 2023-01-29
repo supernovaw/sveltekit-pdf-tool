@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { base } from "$app/paths";
+  import { API_URL } from "$lib/consts";
   import { authState, extraction } from "$lib/state";
   import { onMount } from "svelte";
   import { fly } from "svelte/transition";
@@ -14,8 +15,9 @@
     if (!$authState.key) return;
     loading = true;
     errorMsg = null;
-    const response = await fetch(`${base}/authenticate`, {
+    const response = await fetch(`${API_URL}/authenticate`, {
       method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ action: "verify", key: $authState.key }),
     });
     loading = false;
