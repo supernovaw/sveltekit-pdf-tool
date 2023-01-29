@@ -31,7 +31,7 @@ export const POST: RequestHandler = async ({ request }) => {
     case "remove":
       return await handleRemove(key);
     case "extract":
-      return await handleExtract(request, formData, key);
+      return await handleExtract(formData, key);
     default:
       throw error(400, "unknown action '" + action + "'");
   }
@@ -63,7 +63,7 @@ async function handleRemove(key: string) {
   return json({ success: true });
 }
 
-async function handleExtract(request: Request, formData: FormData, key: string) {
+async function handleExtract(formData: FormData, key: string) {
   // Validate and parse pages
   let pages: any[] = String(formData.get("pages")).split(",");
   for (const p of pages)
@@ -75,14 +75,13 @@ async function handleExtract(request: Request, formData: FormData, key: string) 
   const pagesCount = getPagesCount(origFile);
   pages = pages.map(v => parseInt(v)).sort();
   removeConsecutiveDuplicates(pages);
+  if (pages.length === pagesCount)
+    throw error(400, "all pages selected");
   for (const p of pages)
     if (p < 1 || p > pagesCount)
       throw error(400, `out of range page (${p}/${pagesCount})`);
 
-  // TODO instead of copying, perform extraction
-  fs.copyFileSync(origFile, extrFile);
-
-  return json({ success: true });
+  return extractDocument(origFile, extrFile, pages);
 }
 
 function getPagesCount(filename: string): number {
@@ -116,4 +115,19 @@ export const GET: RequestHandler = async ({ url }) => {
   const response = new Response(fs.readFileSync(filename));
   response.headers.set("Content-Type", "application/pdf");
   return response;
+}
+
+// This function accepts already validated arguments
+function extractDocument(sourceFile: string, targetFile: string, pages: number[]) {
+  const sourceEscaped = "'" + sourceFile.replaceAll("'", "'\\''") + "'";
+  const targetEscaped = "'" + targetFile.replaceAll("'", "'\\''") + "'";
+  const pagesArg = pages.join(" "); // e.g. "5 6 7 10 13 14 15"
+  const command = `pdftk ${sourceEscaped} cat ${pagesArg} output ${targetEscaped}`;
+  try {
+    child_process.execSync(command).toString();
+  } catch (e: any) {
+    console.log(e.message);
+    throw error(500, "command execution failed");
+  }
+  return json({ success: true });
 }
