@@ -24,7 +24,7 @@ export function removeFromArray(aStr: string[], bStr: string[]): string[] {
 }
 
 // Modifies array in place and returns it
-function removeConsecutiveDuplicates(array: any[]) {
+export function removeConsecutiveDuplicates(array: any[]) {
   for (let i = 1; i < array.length; i++) {
     if (array[i - 1] !== array[i]) continue;
     array.splice(i, 1);

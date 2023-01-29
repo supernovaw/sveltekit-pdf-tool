@@ -8,6 +8,8 @@
   let uploadError: string | null;
   let removeLoading: boolean = false;
   let sentFileName: string | undefined;
+  let extractLoading: boolean = false;
+  let extractError: string | null;
 
   async function onUpload(e: any) {
     const getInput = (name: string) =>
@@ -76,6 +78,34 @@
     }
   }
 
+  async function onExtract() {
+    if (selectedPages.length === 0) return alert("No pages selected");
+    if (selectedPages.length === $extraction.totalPages)
+      return alert("Every page is selected");
+    const formData = new FormData();
+    formData.append("action", "extract");
+    formData.append("key", $authState.key!);
+    formData.append("pages", selectedPages.join(","));
+    extractLoading = true;
+    extractError = null;
+    await fetch(`${base}/extract`, {
+      method: "POST",
+      body: formData,
+    })
+      .then(onExtractResponse)
+      .catch((err) => (extractError = `Extraction failed (${err.message})`))
+      .finally(() => (extractLoading = false));
+  }
+
+  async function onExtractResponse(response: Response) {
+    const json: any = await response.json();
+    if (!response.ok || !json.success) {
+      extractError = `Extraction failed (${json.message || response.status})`;
+      return;
+    }
+    $extraction.stage = "processed";
+  }
+
   let allPages: string[];
   let selectedPages: string[];
 
@@ -85,10 +115,6 @@
       .fill(null)
       .map((_, i) => String(i + 1));
     selectedPages = [];
-  }
-
-  function onExtract() {
-    console.log("TODO extract " + selectedPages.length + " pages");
   }
 </script>
 
@@ -123,11 +149,32 @@
       {allPages}
       onSelectionChanged={(p) => (selectedPages = p)}
     />
-    <button on:click={onExtract}>Extract</button>
+    <button on:click={onExtract} aria-busy={extractLoading}>Extract</button>
+    {#if extractError}
+      <h5 class="error" transition:slide|local>{extractError}</h5>
+    {/if}
   </form>
 {:else if $extraction.stage === "processed"}
   <!-- Step 3 (download) -->
-  (TODO download...)
+  <h4>Step 1: upload document ({$extraction.filename})</h4>
+  <h4>Step 2: select pages</h4>
+  <h4>Step 3: download</h4>
+  <a
+    role="button"
+    style="width: 500px"
+    href="{base}/extract?key={$authState.key}"
+    download="Extracted-{$extraction.filename}"
+    data-sveltekit-preload-data="off"
+  >
+    Download
+  </a>
+  <button
+    class="center secondary"
+    on:click={onRemoveFile}
+    aria-busy={removeLoading}
+  >
+    Start over
+  </button>
 {/if}
 
 <style>
@@ -138,9 +185,15 @@
 
   form.wide {
     max-width: 750px;
+    padding-bottom: 200px;
   }
 
   .error {
     color: #c32d4e;
+  }
+
+  .center {
+    max-width: 500px;
+    margin: 8px auto;
   }
 </style>
