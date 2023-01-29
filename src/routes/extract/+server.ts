@@ -87,21 +87,22 @@ async function handleExtract(formData: FormData, key: string) {
 function getPagesCount(filename: string): number {
   if (!fs.existsSync(filename))
     throw error(500, "file missing");
-  // Example: "./user-pdfs/key1.pdf: PDF document, version 1.4, 585 pages"
-  let fileInfo = child_process
-    .execSync(`file '${filename.replaceAll("'", "'\\''")}'`)
-    .toString();
-
-  if (!fileInfo.startsWith(filename + ": "))
-    throw error(500, "unexpected problem when processing file");
-  fileInfo = fileInfo.substring((filename.length + 2)).trimEnd();
-
-  if (!fileInfo.startsWith("PDF document"))
-    throw error(400, "not a valid PDF document");
-
-  const match = fileInfo.match(/ (\d+) pages/);
-  if (!match) throw error(400, "failed to check page count");
-  return +match[1];
+  let metadataDump;
+  try {
+    metadataDump = child_process
+      .execSync(`pdftk '${filename.replaceAll("'", "'\\''")}' dump_data`)
+      .toString()
+      .split("\n");
+  } catch (e) {
+    throw error(400, "could not process (invalid file?)");
+  }
+  for (const line of metadataDump) {
+    const match = line.match(/^NumberOfPages: (\d+)$/);
+    if (match) {
+      return +match[1];
+    }
+  }
+  throw error(400, "failed to check page count");
 }
 
 export const GET: RequestHandler = async ({ url }) => {
