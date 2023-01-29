@@ -1,7 +1,7 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { base } from "$app/paths";
-  import { authState } from "$lib/state";
+  import { authState, extraction } from "$lib/state";
   import { onMount } from "svelte";
   import { fly } from "svelte/transition";
 
@@ -11,6 +11,7 @@
   onMount(checkKeyValidity);
 
   async function checkKeyValidity() {
+    if (!$authState.key) return;
     loading = true;
     errorMsg = null;
     const response = await fetch(`${base}/authenticate`, {
@@ -46,6 +47,7 @@
 
   function logout() {
     $authState = { key: null, valid: false };
+    $extraction = { stage: "none", totalPages: undefined, filename: undefined };
   }
 
   const flyDur = 300;

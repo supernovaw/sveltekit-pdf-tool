@@ -1,6 +1,6 @@
 import { error, json, type RequestHandler } from "@sveltejs/kit";
 
-const authorisedKeys = ["pass"];
+export const authorisedKeys = ["pass"];
 
 export const POST: RequestHandler = async ({ request }) => {
   let payload;
