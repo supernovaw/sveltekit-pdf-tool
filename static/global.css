@@ -14,7 +14,8 @@ body {
 
 @media only screen and (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
-        --background-color: #181a1b;
+        --background-color-override: #181a1b;
+        --background-color: var(--background-color-override);
     }
 }
 

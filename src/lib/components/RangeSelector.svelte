@@ -75,38 +75,40 @@
   }
 </script>
 
-<div class="range">
-  {#if parseError}
-    <div class="parse-error" transition:fly={{ y: 10, duration: 200 }}>
-      {parseError}
+<div>
+  <div class="range">
+    {#if parseError}
+      <div class="parse-error" transition:fly={{ y: 10, duration: 200 }}>
+        {parseError}
+      </div>
+    {/if}
+    <input
+      type="text"
+      bind:value={rangeText}
+      aria-invalid={parsedNumbers ? false : parseError ? true : undefined}
+      placeholder="Type ranges, e.g. 5, 7-10, 12-15, 18, 20-last"
+    />
+    <div>
+      <button class="secondary" on:click={onAdd}>Add</button>
+      <button class="secondary" on:click={onRemove}>Remove</button>
+      <button class="secondary outline" on:click={() => (rangeText = "1-last")}>
+        All
+      </button>
     </div>
-  {/if}
-  <input
-    type="text"
-    bind:value={rangeText}
-    aria-invalid={parsedNumbers ? false : parseError ? true : undefined}
-    placeholder="Type ranges, e.g. 5, 7-10, 12-15, 18, 20-last"
-  />
-  <div>
-    <button class="secondary" on:click={onAdd}>Add</button>
-    <button class="secondary" on:click={onRemove}>Remove</button>
-    <button class="secondary" on:click={() => (rangeText = "1-last")}>
-      All
-    </button>
   </div>
-</div>
-<div class="page-checkboxes">
-  {#each allPages as pageNumber}
-    <label>
-      <input
-        type="checkbox"
-        value={pageNumber}
-        bind:group={selectedPages}
-        on:change={() => onSelectionChanged(selectedPages)}
-      />
-      {pageNumber}
-    </label>
-  {/each}
+  <div class="page-checkboxes">
+    {#each allPages as pageNumber}
+      <label>
+        <input
+          type="checkbox"
+          value={pageNumber}
+          bind:group={selectedPages}
+          on:change={() => onSelectionChanged(selectedPages)}
+        />
+        {pageNumber}
+      </label>
+    {/each}
+  </div>
 </div>
 
 <style>
@@ -129,7 +131,11 @@
     column-gap: 8px;
     top: 0;
     padding-top: 20px;
-    background: linear-gradient(to top, transparent 0, var(--background-color) 30px)
+    background: linear-gradient(
+      to top,
+      transparent 0,
+      var(--background-color) 30px
+    );
   }
 
   .range div {
@@ -145,6 +151,10 @@
   .range button {
     flex: 0;
     min-width: fit-content;
+  }
+
+  button.outline {
+    background-color: var(--background-color-override);
   }
 
   .page-checkboxes {
