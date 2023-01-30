@@ -88,9 +88,9 @@
     placeholder="Type ranges, e.g. 5, 7-10, 12-15, 18, 20-last"
   />
   <div>
-    <button on:click={onAdd} class="secondary">Add</button>
-    <button on:click={onRemove} class="secondary">Remove</button>
-    <button on:click={() => (rangeText = "1-last")} class="secondary">
+    <button class="secondary" on:click={onAdd}>Add</button>
+    <button class="secondary" on:click={onRemove}>Remove</button>
+    <button class="secondary" on:click={() => (rangeText = "1-last")}>
       All
     </button>
   </div>
@@ -113,7 +113,7 @@
   .parse-error {
     font-size: 80%;
     position: absolute;
-    bottom: calc(100% + 10px);
+    top: calc(100% - 12px);
     pointer-events: none;
     background-color: var(--form-element-background-color);
     border: 1px solid var(--form-element-border-color);
@@ -123,10 +123,13 @@
   }
 
   .range {
-    position: relative;
+    position: sticky;
     display: flex;
     flex-wrap: wrap;
     column-gap: 8px;
+    top: 0;
+    padding-top: 20px;
+    background: linear-gradient(to top, transparent 0, var(--background-color) 30px)
   }
 
   .range div {
@@ -147,11 +150,13 @@
   .page-checkboxes {
     display: flex;
     flex-wrap: wrap;
+    padding-top: 15px;
+    padding-inline: 35px 15px;
     padding-bottom: 16px;
   }
 
   .page-checkboxes label {
-    flex-basis: 75px;
+    flex-basis: 70px;
     text-align: start;
     font-size: 70%;
   }

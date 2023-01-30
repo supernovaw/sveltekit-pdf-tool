@@ -26,7 +26,7 @@
     try {
       json = await response.json();
     } catch (e: any) {
-      errorMsg = `Failed to verify key (${e.message})`;
+      errorMsg = `Failed to verify key (${response.status})`;
       return;
     }
 

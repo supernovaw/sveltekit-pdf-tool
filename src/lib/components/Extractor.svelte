@@ -37,7 +37,9 @@
   }
 
   async function onUploadResponse(response: Response) {
-    const { message, pages } = await response.json();
+    const { message, pages } = await response
+      .json()
+      .catch(() => response.status);
     if (!response.ok) {
       uploadError = `Upload failed (${message || response.status})`;
       return;
@@ -139,7 +141,7 @@
     </button>
   </h4>
   <form class="wide" on:submit|preventDefault>
-    <h4>
+    <h4 style="margin-bottom: 0">
       Step 2: select pages ({selectedPages.length}/{$extraction.totalPages})
     </h4>
     <RangeSelector
