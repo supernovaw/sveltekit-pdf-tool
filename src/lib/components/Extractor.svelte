@@ -1,6 +1,6 @@
 <script lang="ts">
   import { checkForOverlap } from "$lib/arrayUtils";
-  import { API_URL } from "$lib/consts";
+  import { API_URL, ARCHIVE_EXTENSION } from "$lib/consts";
   import { authState, extraction } from "$lib/state";
   import { slide } from "svelte/transition";
   import RangeSelector from "./RangeSelector.svelte";
@@ -80,9 +80,11 @@
 
   async function onExtract() {
     const formData = new FormData();
-    formData.append("action", "extract");
     formData.append("key", $authState.key!);
-    formData.append("selections", JSON.stringify($extraction.addedSelections));
+    formData.append(
+      "selections",
+      formatSelectionForServer($extraction.addedSelections!)
+    );
     extractLoading = true;
     extractError = null;
     await fetch(`${API_URL}/extract`, {
@@ -101,6 +103,13 @@
       return;
     }
     $extraction.stage = "processed";
+  }
+
+  function formatSelectionForServer(selections: [string, string][]): string {
+    // example: "FileA\n1,2,3\nFileB\n6,7,10"
+    return selections
+      .map(([name, sel]) => name.replace("\n", " ").trim() + "\n" + sel)
+      .join("\n");
   }
 
   // when this value changes, selection in RangeSelector is externally updated
@@ -179,6 +188,16 @@
       .fill(null)
       .map((_, i) => String(i + 1));
     selectedPages = [];
+  }
+
+  let downloadFilename: string;
+  $: downloadFilename = formatDownloadFilename($extraction.filename);
+  function formatDownloadFilename(orig: string | undefined): string {
+    if (!orig) return "Extracted" + ARCHIVE_EXTENSION;
+    const basename = orig.toLowerCase().endsWith(".pdf")
+      ? orig.substring(0, ARCHIVE_EXTENSION.length - 4)
+      : orig;
+    return "Extracted " + basename + ARCHIVE_EXTENSION;
   }
 </script>
 
@@ -280,7 +299,7 @@
     role="button"
     style="width: 500px"
     href="{API_URL}/download?key={$authState.key}"
-    download="Extracted-{$extraction.filename}"
+    download={downloadFilename}
     data-sveltekit-preload-data="off"
   >
     Download
