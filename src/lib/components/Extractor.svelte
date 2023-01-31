@@ -195,7 +195,7 @@
   function formatDownloadFilename(orig: string | undefined): string {
     if (!orig) return "Extracted" + ARCHIVE_EXTENSION;
     const basename = orig.toLowerCase().endsWith(".pdf")
-      ? orig.substring(0, ARCHIVE_EXTENSION.length - 4)
+      ? orig.substring(0, orig.length - ".pdf".length)
       : orig;
     return "Extracted " + basename + ARCHIVE_EXTENSION;
   }
