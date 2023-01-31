@@ -49,7 +49,7 @@
 
   function logout() {
     $authState = { key: null, valid: false };
-    $extraction = { stage: "none", totalPages: undefined, filename: undefined };
+    $extraction = { stage: "none" };
   }
 
   const flyDur = 300;

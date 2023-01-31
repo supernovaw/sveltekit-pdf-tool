@@ -23,8 +23,9 @@ authState.subscribe(v => updateLocalStorage("authState", v));
 
 type Extraction = {
   stage: "none" | "uploaded" | "processed",
-  totalPages: number | undefined,
-  filename: string | undefined,
+  totalPages?: number,
+  filename?: string,
+  addedSelections?: [string, string][], // e.g. [["FileA", "1,2,3"], ["FileB", "6,10"]]
 };
 export const extraction = writable<Extraction>(shadowObj.extraction || { stage: "none" });
 extraction.subscribe(v => updateLocalStorage("extraction", v));

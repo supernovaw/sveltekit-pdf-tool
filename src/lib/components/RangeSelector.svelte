@@ -11,6 +11,16 @@
   let parseError: string | undefined;
   let parsedNumbers: string[] | undefined;
 
+  // When this prop changes, set internal selection to external.
+  // This is the workaround I found that avoids an infinite loop.
+  export let externalSelectionController: any;
+  export let externalSelection: string[];
+  $: onSelectionForciblyUpdated(externalSelectionController);
+  function onSelectionForciblyUpdated(_: any) {
+    selectedPages = externalSelection;
+    rangeText = "";
+  }
+
   function onAdd() {
     if (!parsedNumbers) return;
     selectedPages = addToArray(selectedPages, parsedNumbers);
@@ -75,40 +85,39 @@
   }
 </script>
 
-<div>
-  <div class="range">
-    {#if parseError}
-      <div class="parse-error" transition:fly={{ y: 10, duration: 200 }}>
-        {parseError}
-      </div>
-    {/if}
-    <input
-      type="text"
-      bind:value={rangeText}
-      aria-invalid={parsedNumbers ? false : parseError ? true : undefined}
-      placeholder="Type ranges, e.g. 5, 7-10, 12-15, 18, 20-last"
-    />
-    <div>
-      <button class="secondary" on:click={onAdd}>Add</button>
-      <button class="secondary" on:click={onRemove}>Remove</button>
-      <button class="secondary outline" on:click={() => (rangeText = "1-last")}>
-        All
-      </button>
+<div class="range">
+  {#if parseError}
+    <div class="parse-error" transition:fly={{ y: 10, duration: 200 }}>
+      {parseError}
     </div>
+  {/if}
+  <input
+    type="text"
+    bind:value={rangeText}
+    style="background-color: var(--background-color-override)"
+    aria-invalid={parsedNumbers ? false : parseError ? true : undefined}
+    placeholder="Type ranges, e.g. 5, 7-10, 12-15, 18, 20-last"
+  />
+  <div>
+    <button class="secondary" on:click={onAdd}>Add</button>
+    <button class="secondary" on:click={onRemove}>Remove</button>
+    <button class="secondary outline" on:click={() => (rangeText = "1-last")}>
+      All
+    </button>
   </div>
-  <div class="page-checkboxes">
-    {#each allPages as pageNumber}
-      <label>
-        <input
-          type="checkbox"
-          value={pageNumber}
-          bind:group={selectedPages}
-          on:change={() => onSelectionChanged(selectedPages)}
-        />
-        {pageNumber}
-      </label>
-    {/each}
-  </div>
+</div>
+<div class="page-checkboxes">
+  {#each allPages as pageNumber}
+    <label>
+      <input
+        type="checkbox"
+        value={pageNumber}
+        bind:group={selectedPages}
+        on:change={() => onSelectionChanged(selectedPages)}
+      />
+      {pageNumber}
+    </label>
+  {/each}
 </div>
 
 <style>
@@ -117,7 +126,7 @@
     position: absolute;
     top: calc(100% - 12px);
     pointer-events: none;
-    background-color: var(--form-element-background-color);
+    background-color: var(--background-color-override);
     border: 1px solid var(--form-element-border-color);
     border-radius: 0.5em;
     padding: 0.25em 0.5em;
@@ -169,6 +178,8 @@
     flex-basis: 70px;
     text-align: start;
     font-size: 70%;
+    user-select: none;
+    cursor: pointer;
   }
 
   .page-checkboxes input {

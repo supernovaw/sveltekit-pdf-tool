@@ -12,6 +12,13 @@ body {
 
 /* Customisations for Pico CSS */
 
+@media only screen {
+    :root:not([data-theme="dark"]) {
+        --background-color-override: #fff;
+        --background-color: var(--background-color-override);
+    }
+}
+
 @media only screen and (prefers-color-scheme: dark) {
     :root:not([data-theme="light"]) {
         --background-color-override: #181a1b;

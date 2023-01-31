@@ -32,3 +32,13 @@ export function removeConsecutiveDuplicates(array: any[]) {
   }
   return array;
 }
+
+// Returns the name of an existing selection that the new one overlaps with, if any
+export function checkForOverlap(existingSelections: [string, string][], newSelection: string[]): string | undefined {
+  const set = new Set(newSelection);
+  for (const [name, selection] of existingSelections) {
+    const pages = selection.split(",")
+    for (const p of pages)
+      if (set.has(p)) return name;
+  }
+}
